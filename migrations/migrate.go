@@ -32,7 +32,7 @@ func main() {
 	}
 
 	// Automigrate will check the defined model and attempt to automatically migrate the schema
-	err = db.AutoMigrate(&models.Habit{})
+	err = db.AutoMigrate(&models.User{}, &models.Habit{}, &models.HabitCompletion{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}

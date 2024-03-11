@@ -23,6 +23,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 		api.GET("/habits", habitHandler.GetHabits)
 		api.POST("/habits", habitHandler.CreateHabit)
+		// api.GET("/habits/:userId", habitHandler.GetHabitByUser)
+		api.POST("/habits/:habitId/completions", habitHandler.AddCompletion)
 	}
 
 	return router

@@ -26,3 +26,9 @@ func (repo *HabitRepository) CreateHabit(habit models.Habit) (models.Habit, erro
 	err := repo.db.Create(&habit).Error
 	return habit, err
 }
+
+// Function to add a new habit completion
+func (repo *HabitRepository) AddCompletion(habitCompletion models.HabitCompletion) (models.HabitCompletion, error) {
+	err := repo.db.Create(&habitCompletion).Error
+	return habitCompletion, err
+}

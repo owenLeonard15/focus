@@ -59,3 +59,20 @@ func (h *HabitHandler) CreateHabit(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusCreated, habit)
 }
+
+// AddCompletion handler
+func (h *HabitHandler) AddCompletion(c *gin.Context) {
+	var habitCompletion models.HabitCompletion
+	if err := c.BindJSON(&habitCompletion); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	habitCompletion, err := h.repo.AddCompletion(habitCompletion)
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, habitCompletion)
+}
