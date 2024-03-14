@@ -68,7 +68,14 @@ func (h *HabitHandler) AddCompletion(c *gin.Context) {
 		return
 	}
 
-	habitCompletion, err := h.repo.AddCompletion(habitCompletion)
+	// make sure habit exists
+	_, err := h.repo.GetHabitByID(habitCompletion.HabitID)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "habit does not exist"})
+		return
+	}
+
+	habitCompletion, err = h.repo.AddCompletion(habitCompletion)
 	if err != nil {
 		c.IndentedJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

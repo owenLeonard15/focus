@@ -21,6 +21,13 @@ func (repo *HabitRepository) GetHabits() ([]models.Habit, error) {
 	return habits, err
 }
 
+// Function to get a habit by ID
+func (repo *HabitRepository) GetHabitByID(id int) (models.Habit, error) {
+	var habit models.Habit
+	err := repo.db.First(&habit, id).Error
+	return habit, err
+}
+
 // Function to add a new habit
 func (repo *HabitRepository) CreateHabit(habit models.Habit) (models.Habit, error) {
 	err := repo.db.Create(&habit).Error
