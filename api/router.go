@@ -18,6 +18,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	habitRepo := repository.NewHabitRepository(db)
 	habitHandler := handlers.NewHabitHandler(habitRepo)
 
+	oauthHandler := handlers.NewOAuthHandler()
+
 	// Routes
 	api := router.Group("/api")
 	{
@@ -25,6 +27,10 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		api.POST("/habits", habitHandler.CreateHabit)
 		// api.GET("/habits/:userId", habitHandler.GetHabitByUser)
 		api.POST("/habits/completions", habitHandler.AddCompletion)
+
+		// OAuth Routes
+		api.GET("/auth/whoop", oauthHandler.AuthWhoop)
+		api.GET("/callback", oauthHandler.Callback)
 	}
 
 	return router
