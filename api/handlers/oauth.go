@@ -19,7 +19,6 @@ func NewOAuthHandler() *OAuthHandler {
 }
 
 func generateState() (string, error) {
-	// Generate a random 8-byte state
 	state := make([]byte, 8)
 	if _, err := rand.Read(state); err != nil {
 		return "", err
@@ -31,6 +30,7 @@ func (h *OAuthHandler) AuthWhoop(c *gin.Context) {
 	clientID := os.Getenv("WHOOP_CLIENT_ID")
 	redirectURI := os.Getenv("REDIRECT_URI")
 	scope := "read:recovery read:cycles read:workout read:sleep read:profile read:body_measurement"
+	userId := c.Query("userId")
 
 	state, err := generateState()
 	if err != nil {
@@ -38,18 +38,18 @@ func (h *OAuthHandler) AuthWhoop(c *gin.Context) {
 		return
 	}
 
-	authURL := fmt.Sprintf("https://api.prod.whoop.com/oauth/oauth2/auth?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s", clientID, redirectURI, scope, state)
+	authURL := fmt.Sprintf("https://api.prod.whoop.com/oauth/oauth2/auth?client_id=%s&response_type=code&redirect_uri=%s&scope=%s&state=%s&userId=%s", clientID, redirectURI, scope, state, userId)
 	c.Redirect(http.StatusFound, authURL)
 }
 
 func (h *OAuthHandler) Callback(c *gin.Context) {
 	code := c.Query("code")
 	state := c.Query("state")
+	userId := c.Query("userId")
 	clientID := os.Getenv("WHOOP_CLIENT_ID")
 	clientSecret := os.Getenv("WHOOP_CLIENT_SECRET")
 	redirectURI := os.Getenv("REDIRECT_URI")
 
-	// Todo: validate the state parameter to prevent CSRF attacks
 	if state == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "State parameter is missing"})
 		return
@@ -78,5 +78,20 @@ func (h *OAuthHandler) Callback(c *gin.Context) {
 		return
 	}
 
+	// Store the token securely along with the user ID
+	err = storeTokenForUser(userId, tokenResponse)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store token"})
+		return
+	}
+
 	c.JSON(http.StatusOK, tokenResponse)
+}
+
+func storeTokenForUser(userId string, tokenResponse map[string]interface{}) error {
+	// Implement logic to store the token in the database associated with the user ID
+	// print userId and tokenResponse
+	fmt.Println(userId, tokenResponse)
+	// return db.StoreToken(userId, tokenResponse)
+	return nil
 }
